@@ -1,0 +1,46 @@
+name: Demo to create automatic PR
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  updateAuthor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checking out code
+        uses: actions/checkout@v2
+
+      - name: extract git commit data
+        run: |
+          echo "Extracting Git commit data..."
+          git log -1
+          git log
+          echo "Extraction complete."
+
+      - name: Update author information
+        run: echo ${{ env.shivamnaik6574 }} > AUTHOR
+
+      - name: Raise PR for each commit
+        run: |
+          IFS=$'\n'
+          for commit in $(git log --format=%H); do
+            echo "Creating PR for commit: $commit"
+            git checkout -b "auto-pr-branch-$commit" $commit
+            echo ${{ env.shivamnaik6574 }} > AUTHOR
+            git add AUTHOR
+            git commit --amend --no-edit
+            git push origin "auto-pr-branch-$commit"
+            
+            uses: peter-evans/create-pull-request@v3
+            with:
+              branch: "auto-pr-branch-$commit"
+              base: main
+              title: "Auto PR for commit $commit"
+              committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}
+              author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}
+              body: "This is an automatic PR for commit $commit"
+              token: ${{ secrets.TOKEN }}
+              delete-branch: false
+          done
