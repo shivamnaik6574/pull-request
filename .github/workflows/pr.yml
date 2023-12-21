@@ -18,9 +18,7 @@ jobs:
           git config --global user.name "shivamnaik6574"
 
       - name: Set up GitHub CLI
-        run: |
-          echo "env:
-            TOKEN: \${{ secrets.TOKEN }}" > $GITHUB_ENV
+        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
 
       - name: Install GitHub CLI
         run: |
