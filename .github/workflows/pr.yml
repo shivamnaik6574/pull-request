@@ -18,6 +18,11 @@ jobs:
           git log -1
           git log
           echo "Extraction complete."
+
+     -  name: Configure Git identity
+        run: |
+          git config --global user.email "shivamnaik6574@gmail.com"
+          git config --global user.name "shivamnaik6574"          
      
      -  name: Update author information
         run: echo ${{ env.shivamnaik6574 }} > AUTHOR
