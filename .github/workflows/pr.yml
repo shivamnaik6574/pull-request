@@ -20,7 +20,7 @@ jobs:
       - name: Set up GitHub CLI
         run: |
           echo "env:
-            GH_TOKEN: \${{ secrets.GITHUB_TOKEN }}" > $GITHUB_ENV
+            TOKEN: \${{ secrets.TOKEN }}" > $GITHUB_ENV
 
       - name: Install GitHub CLI
         run: |
