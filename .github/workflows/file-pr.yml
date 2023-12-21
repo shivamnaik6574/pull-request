@@ -28,6 +28,13 @@ jobs:
             jq -r '.[].number' | head -n 100)
           echo "::set-output name=pr_numbers::$PR_NUMBERS"
 
+      - name: Check if pull_request_id.txt exists
+        run: |
+             if [ ! -f pull_request_id.txt ]; then
+               echo "File not found, creating pull_request_id.txt"
+               touch pull_request_id.txt
+             fi
+  
       - name: Create PR IDs Bundle
         run: |
           PR_NUMBERS="${{ steps.get_pr_numbers.outputs.pr_numbers }}"
