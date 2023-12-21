@@ -22,11 +22,6 @@ jobs:
       - name: Update author information
         run: echo ${{ env.shivamnaik6574 }} > AUTHOR
 
-      - name: Configure Git identity
-        run: |
-          git config --global user.email "shivamnaik6574@gmail.com"
-          git config --global user.name "shivamnaik6574"
-
       - name: Raise PR for each commit
         run: |
           IFS=$'\n'
@@ -37,15 +32,16 @@ jobs:
             git add AUTHOR
             git commit --amend --no-edit
             git push origin "auto-pr-branch-$commit"
-            
-            uses: peter-evans/create-pull-request@v3
-            with:
-              branch: "auto-pr-branch-$commit"
-              base: main
-              title: "Auto PR for commit $commit"
-              committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}
-              author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}
-              body: "This is an automatic PR for commit $commit"
-              token: ${{ secrets.TOKEN }}
-              delete-branch: false
           done
+
+      - name: Create Pull Request using action
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: "auto-pr-branch-$commit"
+          base: main
+          title: "Auto PR for commit $commit"
+          committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}
+          author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}
+          body: "This is an automatic PR for commit $commit"
+          token: ${{ secrets.TOKEN }}
+          delete-branch: false
