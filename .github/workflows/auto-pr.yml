@@ -25,6 +25,7 @@ jobs:
      -  name: Raise PR
         uses: peter-evans/create-pull-request@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: "auto-pr-branch"
           base: main
           title: "demo for auto pr"
@@ -32,5 +33,4 @@ jobs:
           author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}>
           body:
             This is to show automatic PR creation
-          token: ${{ secrets.TOKEN}}
           delete-branch: false
