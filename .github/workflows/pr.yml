@@ -1,4 +1,4 @@
-name: Auto Create PRs
+name: Demo to create automatic PR
 
 on:
   push:
@@ -6,39 +6,31 @@ on:
       - main
 
 jobs:
-  createPR:
+  updateAuthor:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
+     -  name: checking out code
         uses: actions/checkout@v2
-      - name: Configure Git identity
+
+     -  name: extract git commit data
         run: |
-          git config --global user.email "shivamnaik6574@gmail.com"
-          git config --global user.name "shivamnaik6574"
+          echo "Extracting Git commit data..."
+          git log -1
+          git log
+          echo "Extraction complete."
+     
+     -  name: Update author information
+        run: echo ${{ env.shivamnaik6574 }} > AUTHOR
 
-      - name: Set up GitHub CLI
-        run: echo "TOKEN=${{ secrets.TOKEN }}" >> $GITHUB_ENV
-
-      - name: Install GitHub CLI
-        run: |
-             sudo apt-get update
-             sudo apt-get install -y unzip
-             wget https://github.com/cli/cli/releases/latest/download/gh_$(curl -s https://api.github.com/repos/cli/cli/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')_linux_amd64.deb
-             sudo dpkg -i gh_*.deb
-             rm gh_*.deb    
-
-      - name: Create PRs for each commit
-        run: |
-          IFS=$'\n'
-          for commit in $(git log --format=%H); do
-            echo "Creating PR for commit: $commit"
-            git checkout -b "auto-pr-branch-$commit" $commit
-            echo "Changes for commit $commit" > description.txt
-            git add description.txt
-            git commit --amend --no-edit
-            git push origin "auto-pr-branch-$commit"
-            
-            gh pr create --base main --head "auto-pr-branch-$commit" --title "Auto PR for commit $commit" --body "$(cat description.txt)"
-          done
-
+     -  name: Raise PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: "auto-pr-branch"
+          base: main
+          title: "demo for auto pr"
+          committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}>
+          author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}>
+          body:
+            This is to show automatic PR creation
+          token: ${{ secrets.TOKEN}}
+          delete-branch: false
