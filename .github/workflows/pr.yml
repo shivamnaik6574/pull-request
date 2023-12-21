@@ -22,10 +22,11 @@ jobs:
 
       - name: Install GitHub CLI
         run: |
-             sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-             sudo apt-add-repository https://cli.github.com/packages
              sudo apt-get update
-             sudo apt-get install gh     
+             sudo apt-get install -y unzip
+             wget https://github.com/cli/cli/releases/latest/download/gh_$(curl -s https://api.github.com/repos/cli/cli/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')_linux_amd64.deb
+             sudo dpkg -i gh_*.deb
+             rm gh_*.deb    
 
       - name: Create PRs for each commit
         run: |
