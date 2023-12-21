@@ -28,12 +28,26 @@ jobs:
             jq -r '.[].number' | head -n 100)
           echo "::set-output name=pr_numbers::$PR_NUMBERS"
 
-      - name: Check if pull_request_id.txt exists
-        run: |
+      -  name: Check if pull_request_id.txt exists
+         run: |
              if [ ! -f pull_request_id.txt ]; then
-               echo "File not found, creating pull_request_id.txt"
-               touch pull_request_id.txt
+                 echo "File not found, creating pull_request_id.txt"
+                 touch pull_request_id.txt
+             else
+                 echo "File pull_request_id.txt already exists"
              fi
+
+      - name: Debug PR Numbers
+        run: |
+            echo "PR Numbers: $PR_NUMBERS"
+    
+      - name: Debug PR IDs
+        run: |
+           echo "PR IDs: ${PR_IDS[@]}"
+
+      - name: Debug ALL IDs
+        run: |
+           echo "All IDs: ${ALL_IDS[@]}"
   
       - name: Create PR IDs Bundle
         run: |
