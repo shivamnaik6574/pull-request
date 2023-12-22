@@ -19,4 +19,4 @@ jobs:
         token: ${{ secrets.TOKEN }}
         commit-message: 'Automated Pull Request'
         title: 'Automated Pull Request'
-        branch: 'main' # Change this to your target branch
+        branch: 'auto-pr-branch'
