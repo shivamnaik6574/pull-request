@@ -28,10 +28,11 @@ jobs:
       - name: Create PR for each commit
         run: |
           COMMIT_COUNT=$(git rev-list --count HEAD)
+          PAT_TOKEN=${{ secrets.PAT_TOKEN }}
           
           for ((i = 1; i <= $COMMIT_COUNT; i++)); do
             COMMIT_HASH=$(git rev-parse HEAD~$i)
-            PR_TITLE="Auto PR for commit $i"
+            PR_TITLE="Auto PR for commit $i: $COMMIT_HASH"
             
             echo "Creating PR for commit $i with title: $PR_TITLE"
             
@@ -39,10 +40,9 @@ jobs:
             GIT_COMMITTER_NAME="shivamnaik6574"
             GIT_COMMITTER_EMAIL="shivamnaik6574@gmail.com"
             
-            # Push changes directly to the auto-pr-branch
-            git push origin $COMMIT_HASH:auto-pr-branch
+            git remote add origin_with_token https://$PAT_TOKEN@github.com/shivamnaik6574/pull-request
+            git push origin_with_token $COMMIT_HASH:auto-pr-branch
             
-            # Create a PR for the pushed commit
             gh pr create --base main --head auto-pr-branch --title "$PR_TITLE" --body "This is an automatic PR for commit $i"
             
             echo "PR created for commit $i"
