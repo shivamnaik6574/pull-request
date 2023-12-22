@@ -32,8 +32,21 @@ jobs:
             TITLE=$(git log --format=%B -n 1 $COMMIT | head -n 1)
             echo "Creating PR for commit $COMMIT with title: $TITLE"
             
+            # Adjust the following line to use the appropriate commit information
             git cherry-pick $COMMIT
-            git commit --allow-empty
             
+            # Check for conflicts and handle them
+            if [ $? -ne 0 ]; then
+              echo "Conflict found. Resolving conflicts."
+              # You may need to add additional steps to resolve conflicts here.
+              # For example, you can use 'git status' and 'git diff' to identify conflicts.
+              # After resolving conflicts, use 'git cherry-pick --continue' to continue the process.
+              git status
+              git diff
+              # Manually resolve conflicts and then continue the cherry-pick
+              git cherry-pick --continue
+            fi
+            
+            # Create the pull request
             gh pr create --base main --head auto-pr-branch --title "$TITLE" --body "This is to show automatic PR creation" --base main
           done
