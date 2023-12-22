@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo "HELLO WORLD	"
+echo "HELLO WORRLD"
+echo "This is a basic example"
