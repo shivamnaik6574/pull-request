@@ -1,32 +1,28 @@
-name: Demo to create automatic PR
+name: Auto PR Workflow
 
 on:
   push:
     branches:
       - main
+      - auto-pr-branch
 
 jobs:
-  updatePR:
+  create_auto_pr:
     runs-on: ubuntu-latest
+
     steps:
-     - name: checking out code
-       uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-     - name: extract git commit data
-       run: |
-         echo "Extracting Git commit data..."
-         git log -1
-         git log
-         echo "Extraction complete."
+    - name: Create Auto-PR
+      run: |
+        COMMIT_MESSAGE=$(git log --format=%B -n 1 $GITHUB_SHA)
+        PR_BRANCH="auto-pr-branch-$(echo $COMMIT_MESSAGE | tr -d '[:space:]' | cut -c 1-8)"
 
-     - name: Update PR
-       run: |
-         for commit_id in $(git rev-list main..HEAD); do
-           echo "Creating PR for commit: $commit_id"
-           echo $commit_id > COMMIT_ID
-           echo $commit_id > AUTHOR
-           git push origin HEAD:auto-pr-branch
-           pr_title="Auto PR for commit: $commit_id"
-           pr_body="This is an automatic PR for commit: $commit_id"
-           gh pr create --title "$pr_title" --body "$pr_body" --base main --head auto-pr-branch --draft=false
-         done
+        git checkout -b $PR_BRANCH
+        git push origin $PR_BRANCH
+
+        gh pr create --base main --head $PR_BRANCH --title "Auto-PR: $COMMIT_MESSAGE" --body "This PR is automatically generated for commit: $GITHUB_SHA"
+
+      env:
+        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
