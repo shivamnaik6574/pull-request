@@ -3,8 +3,7 @@ name: Auto Create Pull Request
 on:
   push:
     branches:
-      - main
-      - auto-pr-branch
+      - main  # Change this to the default branch of your repository
 
 jobs:
   create_pr:
@@ -18,11 +17,9 @@ jobs:
         run: |
           for commit in $(git rev-list HEAD); do
             commit_msg=$(git log --format=%B -n 1 $commit)
-            branch_name="auto-pr-$(echo $commit_msg | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')"
-            git checkout -b $branch_name $commit
-            git push origin $branch_name
-            gh pr create --base main --head $branch_name --title "Auto PR: $commit_msg" --body "Automatically generated PR for commit $commit"
-            git checkout main
+            pr_title="Auto PR: $commit_msg"
+            pr_body="Automatically generated PR for commit $commit"
+            gh pr create --base main --head HEAD --title "$pr_title" --body "$pr_body"
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
