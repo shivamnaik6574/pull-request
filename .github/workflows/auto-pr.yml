@@ -1,4 +1,4 @@
-name: Auto PR on Commit
+name: Demo to create automatic PR
 
 on:
   push:
@@ -6,44 +6,27 @@ on:
       - main
 
 jobs:
-  updateAuthor:
+  updatePR:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+     - name: checking out code
+       uses: actions/checkout@v2
 
-      - name: Fetch complete commit history
-        run: git fetch --unshallow || true
+     - name: extract git commit data
+       run: |
+         echo "Extracting Git commit data..."
+         git log -1
+         git log
+         echo "Extraction complete."
 
-      - name: Extract git commit data
-        run: |
-          echo "Extracting Git commit data..."
-          git log -1
-          git log
-          echo "Extraction complete."
-
-      - name: Update author information
-        run: echo ${{ env.shivamnaik6574 }} > AUTHOR
-
-      - name: Create PR for each commit
-        run: |
-          COMMIT_COUNT=$(git rev-list --count HEAD)
-          PAT_TOKEN=${{ secrets.PAT_TOKEN }}
-          
-          for ((i = 1; i <= $COMMIT_COUNT; i++)); do
-            COMMIT_HASH=$(git rev-parse HEAD~$i)
-            PR_TITLE="Auto PR for commit $i: $COMMIT_HASH"
-            
-            echo "Creating PR for commit $i with title: $PR_TITLE"
-            
-            # Use your preferred way to set the committer and author details
-            GIT_COMMITTER_NAME="shivamnaik6574"
-            GIT_COMMITTER_EMAIL="shivamnaik6574@gmail.com"
-            
-            git remote add origin_with_token https://$PAT_TOKEN@github.com/shivamnaik6574/pull-request
-            git push origin_with_token $COMMIT_HASH:auto-pr-branch
-            
-            gh pr create --base main --head auto-pr-branch --title "$PR_TITLE" --body "This is an automatic PR for commit $i"
-            
-            echo "PR created for commit $i"
-          done
+     - name: Update PR
+       run: |
+         for commit_id in $(git rev-list main..HEAD); do
+           echo "Creating PR for commit: $commit_id"
+           echo $commit_id > COMMIT_ID
+           echo $commit_id > AUTHOR
+           git push origin HEAD:auto-pr-branch
+           pr_title="Auto PR for commit: $commit_id"
+           pr_body="This is an automatic PR for commit: $commit_id"
+           gh pr create --title "$pr_title" --body "$pr_body" --base main --head auto-pr-branch --draft=false
+         done
