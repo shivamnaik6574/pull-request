@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - auto-pr-branch
 
 jobs:
   updateAuthor:
@@ -36,13 +35,15 @@ jobs:
             
             echo "Creating PR for commit $i with title: $PR_TITLE"
             
+            # Use your preferred way to set the committer and author details
             GIT_COMMITTER_NAME="shivamnaik6574"
             GIT_COMMITTER_EMAIL="shivamnaik6574@gmail.com"
             
-            git checkout -b auto-pr-branch-$i $COMMIT_HASH
-            git push origin auto-pr-branch-$i
+            # Push changes directly to the auto-pr-branch
+            git push origin $COMMIT_HASH:auto-pr-branch
             
-            gh pr create --base main --head auto-pr-branch-$i --title "$PR_TITLE" --body "This is an automatic PR for commit $i"
+            # Create a PR for the pushed commit
+            gh pr create --base main --head auto-pr-branch --title "$PR_TITLE" --body "This is an automatic PR for commit $i"
             
             echo "PR created for commit $i"
           done
