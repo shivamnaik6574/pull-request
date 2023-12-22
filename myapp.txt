@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo "HELLO WORRLD"
-echo "I have Changed"
+echo "I have Changed the script"
