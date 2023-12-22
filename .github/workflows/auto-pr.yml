@@ -8,28 +8,17 @@ on:
 jobs:
   autoCreatePR:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checking out code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Extract git commit data
-        run: |
-          echo "Extracting Git commit data..."
-          git log -1
-          git log
-          echo "Extraction complete."
-
-      - name: Auto Create PR
-        id: create_pr
+      - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
         with:
-          branch: "auto-pr-branch-${{ github.sha }}"
-          base: main
           title: "Auto PR for new commit"
-          committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}>
-          author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}>
           body: |
             This is an automatically generated PR for commit ${{ github.sha }}.
-          token: ${{ secrets.TOKEN }}
+          labels: auto-generated
           delete-branch: false
-
+          token: ${{ secrets.TOKEN }}
