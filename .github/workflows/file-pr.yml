@@ -1,68 +1,40 @@
-name: Create PR IDs File
+name: Commit Logger
 
 on:
   push:
     branches:
       - main
+      - auto-pr-branch
 
 jobs:
-  create_pr_ids:
+  commit_logger:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Git
-        run: |
-          git config --global user.email "shivamnaik6574@gmail.com"
-          git config --global user.name "shivamnaik6574"
-
-      - name: Get Latest PR Numbers
-        id: get_pr_numbers
-        run: |
-          OWNER="shivamnaik6574"
-          REPO="auto-merge"
-          PR_NUMBERS=$(curl -s -H "Accept: application/vnd.github.v3+json" \
-            "https://github.com/shivamnaik6574/auto-merge/commits/main/" | \
-            jq -r '.[].number' | head -n 100)
-          echo "::set-output name=pr_numbers::$PR_NUMBERS"
-
-      -  name: Check if pull_request_id.txt exists
-         run: |
-             if [ ! -f pull_request_id.txt ]; then
-                 echo "File not found, creating pull_request_id.txt"
-                 touch pull_request_id.txt
-             else
-                 echo "File pull_request_id.txt already exists"
-             fi
-
-      - name: Debug PR Numbers
-        run: |
-            echo "PR Numbers: $PR_NUMBERS"
     
-      - name: Debug PR IDs
-        run: |
-           echo "PR IDs: ${PR_IDS[@]}"
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Debug ALL IDs
-        run: |
-           echo "All IDs: ${ALL_IDS[@]}"
-  
-      - name: Create PR IDs Bundle
-        run: |
-          PR_NUMBERS="${{ steps.get_pr_numbers.outputs.pr_numbers }}"
-          PR_IDS=()
-          for PR_NUMBER in $PR_NUMBERS
-          do
-            PR_ID=$(curl -s -H "Authorization: token ${{ secrets.TOKEN }}" \
-              "https://api.github.com/repos/$OWNER/$REPO/pulls/$PR_NUMBER" | \
-              jq -r '.id')
-            PR_IDS+=("$PR_ID")
-          done
+    - name: Check if pr-id.txt exists
+      id: check_file
+      run: echo "::set-output name=exists::$(test -f pr-id.txt && echo true || echo false)"
 
-          COMMIT_IDS_BUNDLE=$(git log --pretty=format:'%h' -n 100)
+    - name: Create or append to pr-id.txt
+      run: |
+        if [ "${{ steps.check_file.outputs.exists }}" == "true" ]; then
+          echo "Appending to pr-id.txt"
+          echo "" >> pr-id.txt
+        else
+          echo "Creating pr-id.txt"
+        fi
+        echo "Commit ID: $GITHUB_SHA" >> pr-id.txt
+        echo "Author: $GITHUB_ACTOR" >> pr-id.txt
+        echo "Commit Message: ${{ github.event.head_commit.message }}" >> pr-id.txt
+        echo "Date: $(date)" >> pr-id.txt
 
-          ALL_IDS=($(cat pull_request_id.txt) "${PR_IDS[@]}" "${COMMIT_IDS_BUNDLE[@]}")
-
-          ALL_IDS=($(echo "${ALL_IDS[@]}" | tr ' ' '\n' | sort -u))
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "shivamnaik6574@gmail.com"
+        git config --local user.name "shivamnaik6574"
+        git add pr-id.txt
+        git commit -m "Add commit information"
+        git push
