@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - auto-pr-branch
 
 jobs:
   updateAuthor:
@@ -11,6 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Fetch complete commit history
+        run: git fetch --unshallow || true
 
       - name: Extract git commit data
         run: |
@@ -32,7 +36,6 @@ jobs:
             
             echo "Creating PR for commit $i with title: $PR_TITLE"
             
-            # Use your preferred way to set the committer and author details
             GIT_COMMITTER_NAME="shivamnaik6574"
             GIT_COMMITTER_EMAIL="shivamnaik6574@gmail.com"
             
