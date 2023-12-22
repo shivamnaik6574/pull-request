@@ -4,33 +4,34 @@ on:
   push:
     branches:
       - main
+      - auto-pr-branch
 
 jobs:
   updateAuthor:
     runs-on: ubuntu-latest
     steps:
-     -  name: checking out code
+      - name: checking out code
         uses: actions/checkout@v2
 
-     -  name: extract git commit data
+      - name: extract git commit data
         run: |
           echo "Extracting Git commit data..."
           git log -1
           git log
           echo "Extraction complete."
-     
-     -  name: Update author information
-        run: echo ${{ env.shivamnaik6574 }} > AUTHOR
 
-     -  name: Raise PR
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: "auto-pr-branch"
-          base: main
-          title: "demo for auto pr"
-          committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}>
-          author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME  }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL  }}>
-          body:
-            This is to show automatic PR creation
-          delete-branch: false
+      - name: Update author information
+        run: echo "${{ env.shivamnaik6574 }}" > AUTHOR
+
+      - name: Raise PR for each commit
+        run: |
+          COMMITS=$(git rev-list --first-parent HEAD)
+          for COMMIT in $COMMITS; do
+            TITLE=$(git log --format=%B -n 1 $COMMIT | head -n 1)
+            echo "Creating PR for commit $COMMIT with title: $TITLE"
+            
+            # Adjust the following line to use the appropriate commit information
+            git cherry-pick $COMMIT
+            
+            gh pr create --base main --head auto-pr-branch --title "$TITLE" --body "This is to show automatic PR creation" --base main
+          done
