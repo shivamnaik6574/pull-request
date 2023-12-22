@@ -33,5 +33,3 @@ jobs:
           token: ${{ secrets.TOKEN }}
           delete-branch: false
 
-      - name: Display PR URL
-        run: echo "PR URL:${{ steps.create_pr.outputs.pull_request_url }}"
