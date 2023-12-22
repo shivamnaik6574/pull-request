@@ -14,6 +14,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Set up GitHub CLI
+      run: |
+        echo "Setting up GitHub CLI"
+        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+        sudo apt-add-repository https://cli.github.com/packages
+        sudo apt-get update
+        sudo apt-get install gh
+
     - name: Create Auto-PR
       run: |
         COMMIT_MESSAGE=$(git log --format=%B -n 1 $GITHUB_SHA)
@@ -26,3 +34,4 @@ jobs:
 
       env:
         PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+        TOKEN: ${{ secrets.TOKEN }}
