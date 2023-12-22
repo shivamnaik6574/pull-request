@@ -39,7 +39,7 @@ jobs:
             fi
             
             # Adjust the following line to use the appropriate commit information
-            git cherry-pick $COMMIT
+            git cherry-pick --allow-empty $COMMIT
             
             # Check for conflicts and handle them
             if [ $? -ne 0 ]; then
