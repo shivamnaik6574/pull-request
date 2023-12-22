@@ -1,37 +1,33 @@
-name: Auto PR Workflow
+name: Auto Create PR
 
 on:
   push:
     branches:
-      - main
-      - auto-pr-branch
+      - '*'
 
 jobs:
-  create_auto_pr:
+  autoCreatePR:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checking out code
+        uses: actions/checkout@v2
 
-    - name: Set up GitHub CLI
-      run: |
-        echo "Setting up GitHub CLI"
-        sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-        sudo apt-add-repository https://cli.github.com/packages
-        sudo apt-get update
-        sudo apt-get install gh
+      - name: Extract git commit data
+        run: |
+          echo "Extracting Git commit data..."
+          git log -1
+          git log
+          echo "Extraction complete."
 
-    - name: Create Auto-PR
-      run: |
-        COMMIT_MESSAGE=$(git log --format=%B -n 1 $GITHUB_SHA)
-        PR_BRANCH="auto-pr-branch-$(echo $COMMIT_MESSAGE | tr -d '[:space:]' | cut -c 1-8)"
-
-        git checkout -b $PR_BRANCH
-        git push origin $PR_BRANCH
-
-        gh pr create --base main --head $PR_BRANCH --title "Auto-PR: $COMMIT_MESSAGE" --body "This PR is automatically generated for commit: $GITHUB_SHA"
-
-      env:
-        PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-        TOKEN: ${{ secrets.TOKEN }}
+      - name: Auto Create PR
+        uses: peter-evans/create-pull-request@v3
+        with:
+          branch: "auto-pr-branch"
+          base: main
+          title: "Auto PR for new commit"
+          committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}>
+          author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}>
+          body: |
+            This is an automatically generated PR.
+          token: ${{ secrets.TOKEN }}
+          delete-branch: false
