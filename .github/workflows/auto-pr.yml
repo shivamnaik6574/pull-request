@@ -18,12 +18,15 @@ jobs:
           latest_commit=$(git rev-parse HEAD)
           echo "::set-output name=latest_commit::$latest_commit"
 
-      - name: Create Pull Request
+      - name: Set environment variables
         run: |
           latest_commit=${{ needs.create_pr.outputs.latest_commit }}
           commit_msg=$(git log --format=%B -n 1 $latest_commit)
-          pr_title="Auto PR: $commit_msg"
-          pr_body="Automatically generated PR for commit $latest_commit"
-          gh pr create --base main --head $latest_commit --title "$pr_title" --body "$pr_body"
+          echo "PR_TITLE=Auto PR: $commit_msg" >> $GITHUB_ENV
+          echo "PR_BODY=Automatically generated PR for commit $latest_commit" >> $GITHUB_ENV
+
+      - name: Create Pull Request
+        run: |
+          gh pr create --base main --head $latest_commit --title "$PR_TITLE" --body "$PR_BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
