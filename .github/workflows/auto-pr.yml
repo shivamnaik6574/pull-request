@@ -26,4 +26,4 @@ jobs:
           pr_body="Automatically generated PR for commit $latest_commit"
           gh pr create --base main --head $latest_commit --title "$pr_title" --body "$pr_body"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
