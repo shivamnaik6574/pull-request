@@ -20,14 +20,18 @@ jobs:
           echo "Extraction complete."
 
       - name: Auto Create PR
+        id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
-          branch: "auto-pr-branch"
+          branch: "auto-pr-branch-${{ github.sha }}"
           base: main
           title: "Auto PR for new commit"
           committer: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}>
           author: ${{ secrets.GIT_COMMIT_AUTHOR_NAME }} <${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}>
           body: |
-            This is an automatically generated PR.
+            This is an automatically generated PR for commit ${{ github.sha }}.
           token: ${{ secrets.TOKEN }}
           delete-branch: false
+
+      - name: Display PR URL
+        run: echo "PR URL:${{ steps.create_pr.outputs.pull_request_url }}"
