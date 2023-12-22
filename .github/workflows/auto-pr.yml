@@ -1,32 +1,45 @@
-name: Auto Create Pull Request
+name: Auto PR on Commit
 
 on:
   push:
     branches:
-      - main  # Change this to the default branch of your repository
+      - main
 
 jobs:
-  create_pr:
+  updateAuthor:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get the latest commit SHA
+      - name: Extract git commit data
         run: |
-          latest_commit=$(git rev-parse HEAD)
-          echo "::set-output name=latest_commit::$latest_commit"
+          echo "Extracting Git commit data..."
+          git log -1
+          git log
+          echo "Extraction complete."
 
-      - name: Set environment variables
-        run: |
-          latest_commit=${{ needs.create_pr.outputs.latest_commit }}
-          commit_msg=$(git log --format=%B -n 1 $latest_commit)
-          echo "PR_TITLE=Auto PR: $commit_msg" >> $GITHUB_ENV
-          echo "PR_BODY=Automatically generated PR for commit $latest_commit" >> $GITHUB_ENV
+      - name: Update author information
+        run: echo ${{ env.shivamnaik6574 }} > AUTHOR
 
-      - name: Create Pull Request
+      - name: Create PR for each commit
         run: |
-          gh pr create --base main --head $latest_commit --title "$PR_TITLE" --body "$PR_BODY"
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          
+          for ((i = 1; i <= $COMMIT_COUNT; i++)); do
+            COMMIT_HASH=$(git rev-parse HEAD~$i)
+            PR_TITLE="Auto PR for commit $i"
+            
+            echo "Creating PR for commit $i with title: $PR_TITLE"
+            
+            # Use your preferred way to set the committer and author details
+            GIT_COMMITTER_NAME="shivamnaik6574"
+            GIT_COMMITTER_EMAIL="shivamnaik6574@gmail.com"
+            
+            git checkout -b auto-pr-branch-$i $COMMIT_HASH
+            git push origin auto-pr-branch-$i
+            
+            gh pr create --base main --head auto-pr-branch-$i --title "$PR_TITLE" --body "This is an automatic PR for commit $i"
+            
+            echo "PR created for commit $i"
+          done
