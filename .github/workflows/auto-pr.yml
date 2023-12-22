@@ -32,9 +32,8 @@ jobs:
             TITLE=$(git log --format=%B -n 1 $COMMIT | head -n 1)
             echo "Creating PR for commit $COMMIT with title: $TITLE"
             
-            # Adjust the following line to use the appropriate commit information
             git cherry-pick $COMMIT
+            git commit --allow-empty
             
-            # Create the pull request
             gh pr create --base main --head auto-pr-branch --title "$TITLE" --body "This is to show automatic PR creation" --base main
           done
