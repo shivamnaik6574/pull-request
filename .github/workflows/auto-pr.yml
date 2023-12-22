@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - auto-pr-branch
 
 jobs:
   updateAuthor:
@@ -21,7 +20,10 @@ jobs:
           echo "Extraction complete."
 
       - name: Update author information
-        run: echo "${{ env.shivamnaik6574 }}" > AUTHOR
+        run: |
+          echo "${{ env.shivamnaik6574 }}" > AUTHOR
+          git config user.name "${{ secrets.GIT_COMMIT_AUTHOR_NAME }}"
+          git config user.email "${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}"
 
       - name: Raise PR for each commit
         run: |
@@ -33,5 +35,6 @@ jobs:
             # Adjust the following line to use the appropriate commit information
             git cherry-pick $COMMIT
             
+            # Create the pull request
             gh pr create --base main --head auto-pr-branch --title "$TITLE" --body "This is to show automatic PR creation" --base main
           done
