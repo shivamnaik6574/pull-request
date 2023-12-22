@@ -32,6 +32,12 @@ jobs:
             TITLE=$(git log --format=%B -n 1 $COMMIT | head -n 1)
             echo "Creating PR for commit $COMMIT with title: $TITLE"
             
+            # Check if the commit is empty, skip it if true
+            if git show --pretty=format: --name-only $COMMIT | grep -q '^$'; then
+              echo "Skipping empty commit: $COMMIT"
+              continue
+            fi
+            
             # Adjust the following line to use the appropriate commit information
             git cherry-pick $COMMIT
             
