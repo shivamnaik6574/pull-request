@@ -163,3 +163,8 @@ Commit ID: d94a7df9a2048048aab4c79e44531ce2a403f2d7
 Author: shivamnaik6574
 Commit Message: Merge branch 'main' of https://github.com/shivamnaik6574/pull-request
 Date: Fri Dec 22 10:35:06 UTC 2023
+
+Commit ID: ed06e0a4c11d6b5a941b22cecf3a48fe574c4259
+Author: shivamnaik6574
+Commit Message: Update auto-pr.yml
+Date: Fri Dec 22 10:38:19 UTC 2023
