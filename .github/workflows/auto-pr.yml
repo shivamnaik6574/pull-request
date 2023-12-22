@@ -1,58 +1,28 @@
-name: Demo to create automatic PR
+name: Auto Create Pull Request
 
 on:
   push:
     branches:
       - main
+      - auto-pr-branch
 
 jobs:
-  updateAuthor:
+  create_pr:
     runs-on: ubuntu-latest
+
     steps:
-      - name: checking out code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: extract git commit data
+      - name: Create Pull Request
         run: |
-          echo "Extracting Git commit data..."
-          git log -1
-          git log
-          echo "Extraction complete."
-
-      - name: Update author information
-        run: |
-          echo "${{ env.shivamnaik6574 }}" > AUTHOR
-          git config user.name "${{ secrets.GIT_COMMIT_AUTHOR_NAME }}"
-          git config user.email "${{ secrets.GIT_COMMIT_AUTHOR_EMAIL }}"
-
-      - name: Raise PR for each commit
-        run: |
-          COMMITS=$(git rev-list --first-parent HEAD)
-          for COMMIT in $COMMITS; do
-            TITLE=$(git log --format=%B -n 1 $COMMIT | head -n 1)
-            echo "Creating PR for commit $COMMIT with title: $TITLE"
-            
-            # Check if the commit is empty, skip it if true
-            if git show --pretty=format: --name-only $COMMIT | grep -q '^$'; then
-              echo "Skipping empty commit: $COMMIT"
-              continue
-            fi
-            
-            # Adjust the following line to use the appropriate commit information
-            git cherry-pick --allow-empty $COMMIT
-            
-            # Check for conflicts and handle them
-            if [ $? -ne 0 ]; then
-              echo "Conflict found. Resolving conflicts."
-              # You may need to add additional steps to resolve conflicts here.
-              # For example, you can use 'git status' and 'git diff' to identify conflicts.
-              # After resolving conflicts, use 'git cherry-pick --continue' to continue the process.
-              git status
-              git diff
-              # Manually resolve conflicts and then continue the cherry-pick
-              git cherry-pick --continue
-            fi
-            
-            # Create the pull request
-            gh pr create --base main --head auto-pr-branch --title "$TITLE" --body "This is to show automatic PR creation" --base main
+          for commit in $(git rev-list HEAD); do
+            commit_msg=$(git log --format=%B -n 1 $commit)
+            branch_name="auto-pr-$(echo $commit_msg | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]')"
+            git checkout -b $branch_name $commit
+            git push origin $branch_name
+            gh pr create --base main --head $branch_name --title "Auto PR: $commit_msg" --body "Automatically generated PR for commit $commit"
+            git checkout main
           done
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
