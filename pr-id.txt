@@ -238,3 +238,8 @@ Commit ID: eff70e29841c68fa3478c32f69cac32bfafc2981
 Author: shivamnaik6574
 Commit Message: Delete .github/workflows/notification.txt
 Date: Thu Dec 28 08:51:01 UTC 2023
+
+Commit ID: bc7bfd75b3c0b5f8c6a5e2352ecbdea7c85f91ce
+Author: shivamnaik6574
+Commit Message: Add workflow to notify owner on new contributor
+Date: Thu Dec 28 08:53:19 UTC 2023
