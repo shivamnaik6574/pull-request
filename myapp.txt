@@ -1,5 +1,6 @@
 #!/bin/bash
 
 echo "HELLO WORRLD"
-echo "hello shivam good evening"
 echo "hello kolhapur"
+echo "change made by shivam"
+echo "change made by uday"

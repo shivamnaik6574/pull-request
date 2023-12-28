@@ -31,10 +31,18 @@ jobs:
         echo "Commit Message: ${{ github.event.head_commit.message }}" >> pr-id.txt
         echo "Date: $(date)" >> pr-id.txt
 
+    - name: Create or append to user-specific file
+      run: |
+        user_file="user-${GITHUB_ACTOR}-pr-id.txt"
+        echo "Commit ID: $GITHUB_SHA" >> $user_file
+        echo "Author: $GITHUB_ACTOR" >> $user_file
+        echo "Commit Message: ${{ github.event.head_commit.message }}" >> $user_file
+        echo "Date: $(date)" >> $user_file
+
     - name: Commit and push changes
       run: |
         git config --local user.email "shivamnaik6574@gmail.com"
         git config --local user.name "shivamnaik6574"
-        git add pr-id.txt
+        git add pr-id.txt user-*.txt
         git commit -m "Add commit information"
         git push
