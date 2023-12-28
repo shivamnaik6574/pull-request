@@ -1,0 +1,16 @@
+name: Notify Owner on New Contributor
+
+on:
+  member:
+    types:
+      - added
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify on new contributor
+        run: |
+          echo "A new contributor has been added to the repository." \
+          | mail -s "New Contributor Added" shivamnaik6574@gmail.com
