@@ -21,5 +21,8 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Install Code Inspector
+      run: npm install --save-dev code-inspector
+
     - name: Run Code Inspector
       run: npx code-inspector analyze
