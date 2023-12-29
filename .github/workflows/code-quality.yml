@@ -25,4 +25,8 @@ jobs:
       run: npm install --save-dev code-inspector
 
     - name: Run Code Inspector
-      run: npx code-inspector analyze
+    - run: |
+         BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+         echo "Running Code Inspector on branch: $BRANCH_NAME"
+         ./node_modules/.bin/code-inspector analyze
+
