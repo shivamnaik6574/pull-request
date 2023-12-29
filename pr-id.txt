@@ -288,3 +288,8 @@ Commit ID: e9f72524bb07926fc222680412db0ee4826e1512
 Author: shivamnaik6574
 Commit Message: Update code-quality.yml
 Date: Fri Dec 29 06:41:20 UTC 2023
+
+Commit ID: 05e34e67eb072f7549dbfb85acf62363d6e87670
+Author: shivamnaik6574
+Commit Message: Delete .github/workflows/code-quality.yml
+Date: Fri Dec 29 06:42:40 UTC 2023
