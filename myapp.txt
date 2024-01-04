@@ -2,4 +2,4 @@
 
 echo "HELLO WORRLD"
 echo "hello kolhapur"
-echo "verify pr title"
+echo "user name should be added in pr title"
